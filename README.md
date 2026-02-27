@@ -1,6 +1,6 @@
 # Secure Microservices Architecture
 
-A fullstack microservices architecture demonstrating end-to-end security using Vite + React, Spring Boot, Spring Cloud, Keycloak, and MongoDB.
+A fullstack microservices architecture demonstrating end-to-end security using Vite + React, Spring Boot, Spring Cloud, Keycloak, and H2.
 
 Authentication and authorization are enforced at every layer: the frontend authenticates via Keycloak, the API Gateway validates JWT tokens, and individual microservices enforce role-based access control.
 
