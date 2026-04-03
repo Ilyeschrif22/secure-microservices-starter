@@ -2,6 +2,8 @@ package com.esprit.service;
 
 import com.esprit.entities.Hotel;
 import com.esprit.repository.HotelRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +13,17 @@ import java.util.Optional;
 public class HotelService {
 
     private final HotelRepository hotelRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-    public HotelService(HotelRepository hotelRepository) {
+    private static final String HOTEL_KAFKA_TOPIC = "hotel-events";
+
+    public HotelService(HotelRepository hotelRepository,
+                        KafkaTemplate<String, String> kafkaTemplate,
+                        RabbitTemplate rabbitTemplate) {
         this.hotelRepository = hotelRepository;
+        this.kafkaTemplate = kafkaTemplate;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public List<Hotel> getHotels() {
@@ -25,7 +35,20 @@ public class HotelService {
     }
 
     public Hotel createHotel(Hotel hotel) {
-        return hotelRepository.save(hotel);
+        Hotel saved = hotelRepository.save(hotel);
+
+        // Send a simple Kafka event
+        String message = "Hotel created: id=" + saved.getId() + ", name=" + saved.getName();
+        kafkaTemplate.send(HOTEL_KAFKA_TOPIC, message);
+
+        // Send a RabbitMQ message
+        rabbitTemplate.convertAndSend(
+                com.esprit.config.MessagingConfig.HOTEL_EXCHANGE,
+                com.esprit.config.MessagingConfig.HOTEL_ROUTING_KEY,
+                message
+        );
+
+        return saved;
     }
 
     public Optional<Hotel> updateHotel(Long id, Hotel updated) {

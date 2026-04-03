@@ -1,0 +1,15 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: hotel-kafka-listener
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: hotel-listeners
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+

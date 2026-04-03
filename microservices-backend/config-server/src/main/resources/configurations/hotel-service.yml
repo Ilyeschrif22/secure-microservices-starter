@@ -25,6 +25,12 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.H2Dialect
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
   security:
     oauth2:
       resourceserver:
@@ -41,3 +47,8 @@ eureka:
 logging:
   level:
     org.springframework.security: DEBUG
+
+# Kafka topic for hotel events
+kafka:
+  topic:
+    hotel-events: hotel-events
